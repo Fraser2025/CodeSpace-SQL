@@ -1,0 +1,388 @@
+<title>The Hale Casino Inquiry</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Limelight&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single inspector's docket column; header strip with clock + exhibit tabs, one exhibit open at a time */
+:root {
+  --bg: #edf1ec;
+  --paper: #f8faf6;
+  --ink: #14211a;
+  --muted: #5a6a60;
+  --line: #c9d3cb;
+  --felt: #1f5c40;
+  --felt-ink: #f3f7f2;
+  --brass: #9a6c14;
+  --good: #1f7a46;
+  --bad: #b3261e;
+  --font-display: "Limelight", "Didot", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1611; --paper: #15211a; --ink: #e2e9e3; --muted: #95a59b; --line: #2b3a31;
+    --felt: #3f9a6c; --felt-ink: #08140d; --brass: #d9a441; --good: #5cc48a; --bad: #f07a70;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1611; --paper: #15211a; --ink: #e2e9e3; --muted: #95a59b; --line: #2b3a31;
+  --felt: #3f9a6c; --felt-ink: #08140d; --brass: #d9a441; --good: #5cc48a; --bad: #f07a70;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.6 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: grid; gap: 20px; }
+header { display: grid; gap: 12px; }
+.eyebrow { font: 500 11px/1.2 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); }
+h1 { font: 400 clamp(30px, 7vw, 46px)/1.05 var(--font-display); margin: 0; text-wrap: balance; color: var(--felt); }
+h2 { font: 400 26px/1.15 var(--font-display); margin: 0; text-wrap: balance; }
+p { margin: 0; max-width: 65ch; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between;
+  border-block: 1px solid var(--line); padding-block: 10px; }
+.clock { font: 500 22px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.clock small { font-size: 12px; color: var(--muted); margin-left: 6px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { font: 500 12px/1 var(--font-mono); padding: 7px 9px; border: 1px solid var(--line); border-radius: 3px;
+  background: transparent; color: var(--muted); cursor: pointer; }
+.tab[aria-current="true"] { border-color: var(--felt); color: var(--felt); }
+.tab.done { background: var(--felt); border-color: var(--felt); color: var(--felt-ink); }
+.tab:disabled { cursor: default; opacity: .45; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 22px; display: grid; gap: 16px; min-width: 0; }
+.card .eyebrow { color: var(--muted); }
+.memo { border-left: 3px solid var(--brass); padding-left: 14px; display: grid; gap: 8px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; font: 14px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; min-width: 260px; }
+th, td { text-align: left; padding: 6px 14px 6px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-weight: 500; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+td.num, th.num { text-align: right; }
+.data { font: 15px/1.5 var(--font-mono); font-variant-numeric: tabular-nums; background: var(--bg); padding: 10px 12px; border-radius: 3px; overflow-x: auto; }
+form { display: grid; gap: 14px; }
+.q { display: grid; gap: 6px; }
+label { font-weight: 600; }
+.q .help { color: var(--muted); font-size: 13px; }
+input[type="text"], select, textarea {
+  font: 16px/1.3 var(--font-mono); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 3px; padding: 9px 10px; width: 100%; max-width: 260px;
+}
+textarea { max-width: none; min-height: 70px; font-size: 14px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { font: 600 14px/1 var(--font-body); padding: 11px 16px; border-radius: 3px; border: 1px solid var(--felt);
+  background: var(--felt); color: var(--felt-ink); cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--felt); }
+.btn:disabled { opacity: .5; cursor: default; }
+.feedback { font-weight: 500; }
+.feedback.bad { color: var(--bad); }
+.feedback.good { color: var(--good); }
+.hint { background: var(--bg); border: 1px dashed var(--brass); border-radius: 3px; padding: 10px 12px; font-size: 14px; }
+.hint code, .memo code { font-family: var(--font-mono); font-size: 13px; }
+.finding { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 8px; }
+.stamp { display: inline-block; font: 500 11px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase;
+  border: 1.5px solid currentColor; padding: 5px 8px; border-radius: 2px; transform: rotate(-2deg); width: fit-content; }
+.stamp.good { color: var(--good); } .stamp.bad { color: var(--bad); } .stamp.warn { color: var(--brass); }
+.ledger { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.ledger li { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.ledger li span:first-child { font: 500 12px/1.6 var(--font-mono); color: var(--muted); }
+.suspects { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.suspect { text-align: left; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 3px; padding: 12px; cursor: pointer; display: grid; gap: 4px; font: inherit; }
+.suspect strong { font-weight: 600; }
+.suspect span { font-size: 13px; color: var(--muted); }
+.suspect[aria-pressed="true"] { border-color: var(--felt); box-shadow: inset 0 0 0 1px var(--felt); }
+.big { font: 400 44px/1 var(--font-display); color: var(--felt); font-variant-numeric: tabular-nums; }
+details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+@media (max-width: 480px) { .ledger li { grid-template-columns: 1fr; gap: 2px; } .card { padding: 16px; } }
+@media (prefers-reduced-motion: no-preference) { .finding, .hint { animation: in .3s ease-out; } @keyframes in { from { transform: translateY(4px); opacity: .4; } } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Gaming Commission · Inspection docket GC-2026-0417</div>
+    <h1>The Hale Casino Inquiry</h1>
+    <div class="bar">
+      <div class="clock" id="clock">00:00<small id="pen"></small></div>
+      <nav class="tabs" id="tabs" aria-label="Exhibits"></nav>
+    </div>
+  </header>
+  <main id="main" class="card"></main>
+  <details>
+    <summary>Scratchpad (stays on this page)</summary>
+    <textarea id="scratch" aria-label="Scratchpad" placeholder="Working notes, sums, etc."></textarea>
+  </details>
+</div>
+
+<script>
+const EXHIBITS = [
+  {
+    code: "A", title: "The tip report",
+    memo: `<p>Floor manager <b>Gordon Hale</b> files a weekly report claiming croupiers earn a "typical tip of £32 per shift". Staff say that sounds far too high. Here are last week's nine shift tips at table 3.</p>`,
+    data: `<div class="data">£12 · £15 · £9 · £22 · £14 · £180 · £11 · £16 · £13</div>`,
+    qs: [
+      { id: "a1", label: "Mean tip (£, 1 decimal place)", type: "num", answer: 32.44, tol: 0.06 },
+      { id: "a2", label: "Median tip (£)", type: "num", answer: 14, tol: 0.01 },
+      { id: "a3", label: "Which better describes a typical shift?", type: "choice", options: ["Mean", "Median"], answer: "Median" },
+    ],
+    hint: `Mean = sum ÷ count. Median = the middle value once the list is <b>sorted</b> (here, the 5th of 9). One huge value drags the mean but not the median.`,
+    finding: { stamp: "warn", label: "Misleading", text: "The mean (£32.44) is inflated by one £180 tip; the median is £14. Hale's report flatters the casino. Not a crime yet, but noted." },
+  },
+  {
+    code: "B", title: "The card shuffler",
+    memo: `<p>Dealer <b>Rosa Ngata</b> runs blackjack on an automatic shuffler. To pass certification, the displacement of 8 marked test cards must have a <b>population standard deviation between 1.5 and 2.5</b> positions. Too low means the shuffle is predictable.</p>`,
+    data: `<div class="data">Displacements: 2 · 4 · 4 · 4 · 5 · 5 · 7 · 9</div>`,
+    qs: [
+      { id: "b1", label: "Population standard deviation", help: "Divide by n, not n − 1.", type: "num", answer: 2, tol: 0.05 },
+      { id: "b2", label: "Does the shuffler pass?", type: "choice", options: ["Pass", "Fail"], answer: "Pass" },
+    ],
+    hint: `Find the mean (5). Square each value's distance from the mean, average those squares (that's the variance), then take the square root. <code>σ = √(Σ(x − μ)² ÷ n)</code>`,
+    finding: { stamp: "good", label: "Cleared", text: "σ = 2.0, inside the 1.5–2.5 band. Rosa Ngata's shuffler is certified fair." },
+  },
+  {
+    code: "C", title: "Big winners",
+    memo: `<p>Across the past year, nightly player winnings at the high-limit room have a <b>mean of £500</b> and a <b>standard deviation of £120</b>. The commission flags any night more than 3 standard deviations from the mean.</p>`,
+    data: `<div class="tablewrap"><table><thead><tr><th>Player</th><th class="num">Last night</th></tr></thead><tbody>
+      <tr><td>M. Alvarez</td><td class="num">£710</td></tr>
+      <tr><td>J. Kowalski</td><td class="num">£260</td></tr>
+      <tr><td>V. Chen</td><td class="num">£890</td></tr>
+      <tr><td>P. Dunmore</td><td class="num">£820</td></tr>
+      <tr><td>T. Okafor</td><td class="num">£140</td></tr></tbody></table></div>`,
+    qs: [
+      { id: "c1", label: "Who is the only player beyond 3 standard deviations?", type: "choice", options: ["M. Alvarez", "J. Kowalski", "V. Chen", "P. Dunmore", "T. Okafor"], answer: "V. Chen" },
+      { id: "c2", label: "That player's z-score (2 decimal places)", type: "num", answer: 3.25, tol: 0.006 },
+    ],
+    hint: `<code>z = (x − mean) ÷ SD</code>. Check the size of z ignoring sign. Exactly 3.00 is not <i>more than</i> 3.`,
+    finding: { stamp: "warn", label: "Flagged", text: "Victor Chen won £890, z = 3.25. Extremely unusual. Keep him in view." },
+  },
+  {
+    code: "D", title: "The dice table",
+    memo: `<p>Croupier <b>Dana Brooks</b> is accused of using a loaded die at the craps table: "six comes up all the time". You seize the die and roll it <b>120 times</b>.</p>`,
+    data: `<div class="tablewrap"><table><thead><tr><th>Face</th><th class="num">1</th><th class="num">2</th><th class="num">3</th><th class="num">4</th><th class="num">5</th><th class="num">6</th></tr></thead>
+      <tbody><tr><td>Observed</td><td class="num">16</td><td class="num">19</td><td class="num">17</td><td class="num">18</td><td class="num">20</td><td class="num">30</td></tr></tbody></table></div>
+      <p style="font-size:13px;color:var(--muted)">Chi-square critical value at 5% significance with 5 degrees of freedom: <b>11.07</b>.</p>`,
+    qs: [
+      { id: "d1", label: "Chi-square statistic (1 decimal place)", type: "num", answer: 6.5, tol: 0.06 },
+      { id: "d2", label: "Is there significant evidence the die is loaded?", type: "choice", options: ["Yes, loaded", "No, consistent with fair"], answer: "No, consistent with fair" },
+    ],
+    hint: `A fair die expects 120 ÷ 6 = 20 per face. <code>χ² = Σ (O − E)² ÷ E</code>. If χ² is below the critical value, you cannot reject "fair".`,
+    finding: { stamp: "good", label: "Cleared", text: "χ² = 6.5 < 11.07. Thirty sixes looks suspicious, but it is within normal chance. Dana Brooks is cleared." },
+  },
+  {
+    code: "E", title: "The card-counting alarm",
+    memo: `<p>Security's camera software flagged <b>Victor Chen</b> as a card counter. The software's record:</p>
+      <ul style="margin:0;padding-left:20px">
+        <li>About <b>2%</b> of high-limit players actually count cards.</li>
+        <li>It flags <b>90%</b> of real counters.</li>
+        <li>It wrongly flags <b>5%</b> of honest players.</li>
+      </ul>
+      <p>Commission rules allow a ban only if the probability of cheating is <b>above 50%</b>.</p>`,
+    data: ``,
+    qs: [
+      { id: "e1", label: "P(counter | flagged), as a % to 1 decimal place", type: "pct", answer: 26.87, tol: 0.25 },
+      { id: "e2", label: "Is a ban justified?", type: "choice", options: ["Yes", "No"], answer: "No" },
+    ],
+    hint: `Bayes: P(counter | flag) = P(flag | counter)·P(counter) ÷ P(flag). Picture 1,000 players: 20 counters (18 flagged) and 980 honest (49 flagged). What share of the flagged are counters?`,
+    finding: { stamp: "good", label: "Not proven", text: "Only about 26.9% of flagged players really count cards. Chen's alarm is weak evidence, and his big night alone is not proof." },
+  },
+  {
+    code: "F", title: "The slot machines",
+    memo: `<p>All 40 "Golden Reels" slots are configured by <b>Gordon Hale</b>'s office. By law a slot must return at least <b>£0.85 per £1 staked</b> on average. The payout table from the machine's chip:</p>`,
+    data: `<div class="tablewrap"><table><thead><tr><th>Outcome</th><th class="num">Payout</th><th class="num">Probability</th></tr></thead><tbody>
+      <tr><td>Jackpot</td><td class="num">£50</td><td class="num">0.005</td></tr>
+      <tr><td>Three bars</td><td class="num">£10</td><td class="num">0.020</td></tr>
+      <tr><td>Two cherries</td><td class="num">£2</td><td class="num">0.150</td></tr>
+      <tr><td>One cherry</td><td class="num">£1</td><td class="num">0.070</td></tr>
+      <tr><td>Nothing</td><td class="num">£0</td><td class="num">0.755</td></tr></tbody></table></div>`,
+    qs: [
+      { id: "f1", label: "Expected payout per £1 spin (£, 2 decimal places)", type: "num", answer: 0.82, tol: 0.006 },
+      { id: "f2", label: "Are the machines legal?", type: "choice", options: ["Legal", "Illegal"], answer: "Illegal" },
+    ],
+    hint: `Expected value = Σ (payout × probability). Multiply each row, then add them up.`,
+    finding: { stamp: "bad", label: "Violation", text: "Expected return is £0.82 per £1, below the legal £0.85. Across 40 machines that is thousands skimmed every week." },
+  },
+];
+const SUSPECTS = [
+  { name: "Gordon Hale", role: "Floor manager" },
+  { name: "Rosa Ngata", role: "Blackjack dealer" },
+  { name: "Dana Brooks", role: "Craps croupier" },
+  { name: "Victor Chen", role: "High-roller" },
+];
+const CULPRIT = "Gordon Hale";
+const HINT_COST = 30, WRONG_COST = 15, ACCUSE_COST = 60;
+
+let S = { started: false, done: false, view: 0, solved: [], hints: [], penalty: 0, elapsed: 0, accused: null, wrongAccuse: [], values: {} };
+let tickStart = null;
+
+const $ = s => document.querySelector(s);
+const fmt = s => { s = Math.max(0, Math.round(s)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+const total = () => S.elapsed + S.penalty;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function parseNum(raw, type) {
+  let v = parseFloat(String(raw).replace(/[£%,\s]/g, ""));
+  if (isNaN(v)) return NaN;
+  if (type === "pct" && v > 0 && v < 1) v *= 100;
+  return v;
+}
+
+function tick() {
+  if (S.started && !S.done) {
+    const now = performance.now();
+    if (tickStart != null) S.elapsed += (now - tickStart) / 1000;
+    tickStart = now;
+  }
+  $("#clock").firstChild.nodeValue = fmt(total());
+  $("#pen").textContent = S.penalty ? `incl. +${S.penalty}s penalties` : "";
+}
+
+function renderTabs() {
+  const tabs = EXHIBITS.map((e, i) => {
+    const unlocked = S.started && i <= S.solved.length;
+    return `<button class="tab${S.solved.includes(i) ? " done" : ""}" data-i="${i}" ${unlocked ? "" : "disabled"} aria-current="${S.view === i}">${e.code}</button>`;
+  });
+  const vUnlocked = S.solved.length === EXHIBITS.length;
+  tabs.push(`<button class="tab${S.done ? " done" : ""}" data-i="${EXHIBITS.length}" ${vUnlocked ? "" : "disabled"} aria-current="${S.view === EXHIBITS.length}">Verdict</button>`);
+  $("#tabs").innerHTML = tabs.join("");
+}
+
+function renderIntro() {
+  $("#main").innerHTML = `
+    <div class="eyebrow">Briefing</div>
+    <h2>Someone at the Hale Casino is cheating.</h2>
+    <div class="memo">
+      <p>Complaints have reached the Gaming Commission. You have six exhibits of evidence and four suspects. Each exhibit needs a calculation: means and medians, standard deviation, z-scores, a chi-square test, Bayes' theorem and expected value.</p>
+      <p>Solve each exhibit to log a finding, then name the culprit. A calculator or spreadsheet is allowed. Expect about 10 minutes.</p>
+    </div>
+    <ul class="ledger">
+      <li><span>Wrong answer</span><span>+${WRONG_COST} seconds</span></li>
+      <li><span>Hint</span><span>+${HINT_COST} seconds</span></li>
+      <li><span>Wrong accusation</span><span>+${ACCUSE_COST} seconds</span></li>
+    </ul>
+    <div class="row"><button class="btn" id="start">Open the docket</button></div>`;
+  $("#start").onclick = () => { S.started = true; tickStart = performance.now(); render(); };
+}
+
+function renderExhibit(i) {
+  const e = EXHIBITS[i], solved = S.solved.includes(i), hinted = S.hints.includes(i);
+  const field = q => {
+    const val = S.values[q.id] ?? "";
+    const ctl = q.type === "choice"
+      ? `<select id="${q.id}" ${solved ? "disabled" : ""}><option value="">Choose…</option>${q.options.map(o => `<option${o === val ? " selected" : ""}>${esc(o)}</option>`).join("")}</select>`
+      : `<input type="text" inputmode="decimal" autocomplete="off" id="${q.id}" value="${esc(val)}" ${solved ? "disabled" : ""}>`;
+    return `<div class="q"><label for="${q.id}">${q.label}</label>${q.help ? `<span class="help">${q.help}</span>` : ""}${ctl}</div>`;
+  };
+  $("#main").innerHTML = `
+    <div class="eyebrow">Exhibit ${e.code} of ${EXHIBITS.length}</div>
+    <h2>${e.title}</h2>
+    <div class="memo">${e.memo}</div>
+    ${e.data}
+    <form id="f" novalidate>
+      ${e.qs.map(field).join("")}
+      ${hinted ? `<div class="hint">${e.hint}</div>` : ""}
+      ${solved ? "" : `<div class="row">
+        <button class="btn" type="submit">Submit findings</button>
+        ${hinted ? "" : `<button class="btn ghost" type="button" id="hintBtn">Hint (+${HINT_COST}s)</button>`}
+      </div>`}
+      <div class="feedback" id="fb" role="status"></div>
+    </form>
+    ${solved ? `<div class="finding"><span class="stamp ${e.finding.stamp}">${e.finding.label}</span><p>${e.finding.text}</p>
+      <div class="row"><button class="btn" id="next">${i + 1 < EXHIBITS.length ? "Next exhibit" : "Go to verdict"}</button></div></div>` : ""}`;
+  e.qs.forEach(q => { const el = document.getElementById(q.id); el.addEventListener("input", () => S.values[q.id] = el.value); });
+  const hb = $("#hintBtn");
+  if (hb) hb.onclick = () => { S.hints.push(i); S.penalty += HINT_COST; render(); };
+  const nx = $("#next");
+  if (nx) nx.onclick = () => { S.view = i + 1; render(); };
+  $("#f").onsubmit = ev => {
+    ev.preventDefault();
+    if (solved) return;
+    const wrong = [];
+    for (const q of e.qs) {
+      const raw = document.getElementById(q.id).value;
+      if (raw === "") { $("#fb").className = "feedback bad"; $("#fb").textContent = "Answer every question before submitting."; return; }
+      const ok = q.type === "choice" ? raw === q.answer : Math.abs(parseNum(raw, q.type) - q.answer) <= q.tol;
+      if (!ok) wrong.push(q.label.replace(/\s*\(.*\)$/, ""));
+    }
+    if (wrong.length) {
+      S.penalty += WRONG_COST;
+      $("#fb").className = "feedback bad";
+      $("#fb").textContent = `Not quite. Check: ${wrong.join("; ")}. (+${WRONG_COST}s)`;
+      tick();
+    } else {
+      S.solved.push(i);
+      render();
+    }
+  };
+}
+
+function rank(t) {
+  if (t <= 420) return "Chief Inspector";
+  if (t <= 600) return "Senior Inspector";
+  if (t <= 900) return "Inspector";
+  return "Trainee Inspector";
+}
+
+function renderVerdict() {
+  const ledger = EXHIBITS.map(e => `<li><span>${e.code} · ${e.finding.label}</span><span>${e.finding.text}</span></li>`).join("");
+  if (S.done) {
+    $("#main").innerHTML = `
+      <div class="eyebrow">Case closed</div>
+      <h2>Gordon Hale is charged.</h2>
+      <p>The tip report showed he presents numbers to mislead, and his office set every slot machine to pay back £0.82 per pound, below the legal £0.85. Brooks's die and Ngata's shuffler passed their tests, and Chen's evidence never got past chance.</p>
+      <div><div class="eyebrow">Final time</div><div class="big">${fmt(total())}</div></div>
+      <ul class="ledger">
+        <li><span>Rank</span><span><b>${rank(total())}</b></span></li>
+        <li><span>Solving time</span><span>${fmt(S.elapsed)}</span></li>
+        <li><span>Penalties</span><span>+${S.penalty}s (${S.hints.length} hint${S.hints.length === 1 ? "" : "s"}, ${S.wrongAccuse.length} wrong accusation${S.wrongAccuse.length === 1 ? "" : "s"})</span></li>
+      </ul>
+      <div class="row"><button class="btn ghost" id="again">Play again</button></div>`;
+    $("#again").onclick = () => { S = { started: false, done: false, view: 0, solved: [], hints: [], penalty: 0, elapsed: 0, accused: null, wrongAccuse: [], values: {} }; tickStart = null; render(); };
+    return;
+  }
+  $("#main").innerHTML = `
+    <div class="eyebrow">Verdict</div>
+    <h2>Who do you charge?</h2>
+    <ul class="ledger">${ledger}</ul>
+    <div class="suspects">${SUSPECTS.map(s => `<button class="suspect" aria-pressed="${S.accused === s.name}" data-n="${esc(s.name)}" ${S.wrongAccuse.includes(s.name) ? "disabled style='opacity:.45'" : ""}><strong>${s.name}</strong><span>${s.role}</span></button>`).join("")}</div>
+    <div class="row"><button class="btn" id="accuse" ${S.accused ? "" : "disabled"}>Charge suspect</button></div>
+    <div class="feedback" id="fb" role="status"></div>`;
+  document.querySelectorAll(".suspect").forEach(b => b.onclick = () => { S.accused = b.dataset.n; renderVerdict(); });
+  $("#accuse").onclick = () => {
+    if (S.accused === CULPRIT) { S.done = true; tick(); render(); return; }
+    S.wrongAccuse.push(S.accused); S.penalty += ACCUSE_COST;
+    const name = S.accused; S.accused = null; renderVerdict();
+    $("#fb").className = "feedback bad";
+    $("#fb").textContent = `The evidence doesn't support charging ${name}. Re-read the findings. (+${ACCUSE_COST}s)`;
+  };
+}
+
+function render() {
+  renderTabs();
+  if (!S.started) renderIntro();
+  else if (S.view < EXHIBITS.length) renderExhibit(S.view);
+  else renderVerdict();
+  tick();
+}
+
+$("#tabs").addEventListener("click", ev => {
+  const b = ev.target.closest(".tab");
+  if (!b || b.disabled) return;
+  S.view = +b.dataset.i; render();
+});
+
+try { const s = localStorage.getItem("hale-scratch"); if (s) $("#scratch").value = s; } catch (e) {}
+$("#scratch").addEventListener("input", ev => { try { localStorage.setItem("hale-scratch", ev.target.value); } catch (e) {} });
+
+function start(data) {
+  if (data && data.S) { S = data.S; if (S.started && !S.done) tickStart = performance.now(); }
+  render();
+  setInterval(tick, 500);
+}
+window.claude?.hot?.snapshot?.(() => ({ S }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
